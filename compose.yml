@@ -1,0 +1,42 @@
+services:
+  booking:
+    container_name: booking
+    build: .
+    ports:
+      - "8080:8001"
+    environment:
+      - DB_HOST=booking_db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - redis_url=redis://booking_redis:6379/0
+    networks:
+      - AuroraNetwork
+    depends_on:
+      - booking_db
+  booking_db:
+    container_name: booking_db
+    image: postgres:13
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - AuroraNetwork
+    volumes:
+      - booking_db_data:/var/lib/postgresql/data
+  booking_redis:
+    container_name: booking_redis
+    image: redis:6
+    networks:
+      - AuroraNetwork
+  
+volumes:
+  booking_db_data:
+
+networks:
+  AuroraNetwork:
+    external: true
